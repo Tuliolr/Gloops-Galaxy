@@ -1,0 +1,14 @@
+# Ambientes Virtuais (Não envie isso!)
+.venv/
+venv/
+env/
+__pycache__/
+*.pyc
+
+# Arquivos do Sistema
+.DS_Store
+Thumbs.db
+
+# Pasta de distribuição (se houver)
+dist/
+build/
