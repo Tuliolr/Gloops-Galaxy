@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import pgzrun
 # CONFIGURACOES
 WIDTH = 1000
@@ -64,82 +63,56 @@ def draw():
         screen.draw.text("EXIT", center=btn_exit.pos, fontsize=45, color="white")
         screen.draw.text("GLOOP'S GALAXY", center=(WIDTH // 2, 120 + titulo_y_offset),
                          fontsize=100, color="green", shadow=(2, 2), scolor="darkgreen")
-
     elif game_state == JOGANDO:
         try:
             screen.blit('fase_bg', (0, 0))
         except:
             screen.fill((50, 150, 200))
 
-        # Desenha Plataformas
         for p in plataformas:
             draw_actor_scroll(p, scroll_x)
 
-        # Desenha Lavas
         for lava in lavas:
             draw_actor_scroll(lava, scroll_x)
 
-        # Desenha inimigos
         for slime in inimigos:
             draw_actor_scroll(slime, scroll_x)
 
-        # Desenha Chave com animação vertical
         draw_actor_scroll(Actor(key.image, (key.x, key.y + key_y_offset)), scroll_x)
-
-        # Desenha Porta
         draw_actor_scroll(Actor(porta_base.image, (porta_pos_x, porta_pos_y)), scroll_x)
         draw_actor_scroll(Actor(porta_topo.image, (porta_pos_x, porta_pos_y - 64)), scroll_x)
-
-        # Desenha Player
         draw_actor_scroll(player, scroll_x)
-
-        # HUD (não sofre scroll)
         hud_helmet.draw()
         hud_character3.draw()
         hud_character0.draw()
         hud_key.draw()
 def update():
     global invencivel, velocidade_y
-    
     if game_state == MENU:
         animar_titulo_menu()
         return
-
-    # 1. Vida e Dano
     if invencivel > 0: invencivel -= 1    
     verificar_lava()
     
-    # 2. Input de pulo (SÓ o pulo)
     if keyboard.space and not esta_pulando:
         velocidade_y = -18
-        # esta_pulando vira True automaticamente na função de colisão
-
-    # 3. Movimento Horizontal
+       
     movimento_horizontal()
-    
-    # 4. Física Vertical (Gravidade)
     velocidade_y += gravidade
     player.y += velocidade_y
-    
-    # 5. RESOLUÇÃO DE COLISÃO (Corrige a posição antes de desenhar)
     colisao_vertical()
-    
-    # 6. Itens e Vitórias
     if player.colliderect(key):
         key.x = -1000
     if player.colliderect(porta_base) and key.x < 0:
         print("VOCÊ VENCEU!")
 
-    # 7. Finalização visual
     atualizar_camera()
     animar_player()
     animar_objetos()
 def draw_actor_scroll(actor, scroll_x):
-    # Desenha o ator na posição relativa à câmera sem alterar o X real dele
     screen.blit(actor.image, (actor.left - scroll_x, actor.top))
     
-    # DEBUG: Remova as aspas abaixo para ver as caixas de colisão
-    screen.draw.rect(Rect((actor.left - scroll_x, actor.top), (actor.width, actor.height)), "red")
+   # screen.draw.rect(Rect((actor.left - scroll_x, actor.top), (actor.width, actor.height)), "red")
 # AUXILIARES DE CENARIO
 def eh_lava(indice, zonas_lava):
     for inicio, fim in zonas_lava:
@@ -162,9 +135,9 @@ def montar_cenario():
     global plataformas, lavas
     plataformas.clear()
     lavas.clear()
-    inimigos.clear() # Limpa inimigos ao reiniciar
+    inimigos.clear() 
     largura = 64
-    pos_chao_y = 800 # Nível principal do chão
+    pos_chao_y = 800 
 
     zonas_lava = [(12, 18), (30, 36), (50, 60)] 
 
@@ -179,16 +152,16 @@ def montar_cenario():
             bloco.anchor = ('left', 'top')
             plataformas.append(bloco)
 
-    # Inimigos EXATAMENTE no nível do chão (pos_chao_y)
-    criar_slime_fire(x=500, y=740, x_min=450, x_max=650)
-    criar_slime_fire(x=1000, y=740, x_min=950, x_max=1150)
-    criar_slime_fire(x=2800, y=740, x_min=2750, x_max=2950)
-    criar_plataforma_longa(300, 600, 2)
-    criar_plataforma_longa(750, 500, 3)
-    criar_plataforma_longa(1200, 450, 2)
+    # Inimigos EXATAMENTE no nível do chão 
+    criar_slime_fire(x=500, y=740, x_min=150, x_max=650)
+    criar_slime_fire(x=1500, y=740, x_min=1300, x_max=1700)
+    criar_slime_fire(x=2800, y=740, x_min=2400, x_max=2950)
+    criar_plataforma_longa(500, 650, 2)
+    criar_plataforma_longa(850, 500, 3)
+    criar_plataforma_longa(1250, 550, 2)
     criar_plataforma_longa(1650, 550, 2) 
     criar_plataforma_longa(2100, 500, 3) 
-    criar_plataforma_longa(2550, 450, 2) 
+    criar_plataforma_longa(2550, 500, 2) 
     criar_plataforma_longa(3000, 600, 4) 
     # CAMINHO SUPERIOR (CONECTADO AO PRINCIPAL)
     criar_plataforma_longa(150, 210, 1) 
@@ -228,23 +201,18 @@ def animar_titulo_menu():
 def animar_player():
     global frame, timer_anim, estado
     timer_anim += 1
-    
-    # Define o sufixo da direção para o nome da imagem
     lado = "right" if direcao == 1 else "left"
-    
     # ESTADO: PULO
     if esta_pulando:
         estado = "jump"
         player.image = f"character_green_jump_{lado}" # Ex: character_green_jump_left
-    
     # ESTADO: ANDANDO
     elif andando:
         estado = "walk"
-        if timer_anim >= 10: # Velocidade da animação (menor = mais rápido)
+        if timer_anim >= 10: 
             frame = (frame + 1) % 2
             timer_anim = 0
         
-        # Alterna entre frame a e b
         letra_frame = 'a' if frame == 0 else 'b'
         player.image = f"character_green_walk_{lado}_{letra_frame}"
     
@@ -257,38 +225,30 @@ def movimento_horizontal():
     andando = False
     if keyboard.left:
         player.x -= speed
-        direcao = -1  # Esquerda
+        direcao = -1 
         andando = True
     elif keyboard.right:
         player.x += speed
-        direcao = 1   # Direita
+        direcao = 1  
         andando = True
 def animar_objetos():
     global key_y_offset, key_y_direcao
-    # Animação da Chave
     key_y_offset += key_y_direcao * 0.5 
     if key_y_offset > 10 or key_y_offset < -5:
         key_y_direcao *= -1
-    # Movimento dos Inimigos
     for slime in inimigos:
         atualizar_slime(slime)
         andando = True
 def colisao_vertical():
     global velocidade_y, esta_pulando
-    
-    # Se ele está subindo (velocidade negativa), não checamos colisão com o chão
     if velocidade_y < 0:
         esta_pulando = True
         return
-
     for p in plataformas:
-        # Verifica se o Player está alinhado horizontalmente com a plataforma
         if player.x + 15 > p.left and player.x - 15 < p.right:
-            # Verifica se o pé do player passou do topo da plataforma, 
-            # mas não atravessou a plataforma inteira ainda
             if player.y <= p.top + (velocidade_y + 2) and player.y >= p.top - 5:
-                player.y = p.top  # Trava o player no topo
-                velocidade_y = 0  # Zera a queda
+                player.y = p.top 
+                velocidade_y = 0
                 esta_pulando = False
                 return
 
@@ -331,23 +291,26 @@ def criar_slime_fire(x, y, x_min, x_max):
     slime.anim_frame = 0
 
     inimigos.append(slime)
-
+def tem_chao_firme(x_verificar):
+    for p in plataformas:
+        if x_verificar >= p.left and x_verificar <= p.right:
+            return True
+    return False
 def atualizar_slime(slime):
-    slime.x += slime.velocidade * slime.direcao
-
-    if slime.x >= slime.x_max:
-        slime.direcao = -1
-    elif slime.x <= slime.x_min:
-        slime.direcao = 1
-
-    # Animação
+    proximo_x = slime.x + (slime.velocidade * slime.direcao)
+    bateu_limite = proximo_x >= slime.x_max or proximo_x <= slime.x_min
+    sem_chao_frente = not tem_chao_firme(proximo_x)
+    if bateu_limite or sem_chao_frente:
+        slime.direcao *= -1 
+    else:
+        slime.x = proximo_x 
     slime.anim_timer += 1
     if slime.anim_timer >= 10:
         slime.anim_timer = 0
         slime.anim_frame = 1 - slime.anim_frame
-        # Use o nome correto da sua imagem (ajustado para inverter se necessário)
-        img_nome = 'slime_fire_walk_right_a' if slime.anim_frame == 0 else 'slime_fire_walk_right_b'
-        slime.image = img_nome
+        lado = "right" if slime.direcao == 1 else "left"
+        frame = "a" if slime.anim_frame == 0 else "b"
+        slime.image = f"slime_fire_walk_{lado}_{frame}"
 
 titulo_y_offset = 0
 titulo_y_direcao = 1
