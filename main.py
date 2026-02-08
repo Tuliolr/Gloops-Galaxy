@@ -28,8 +28,16 @@ titulo_y_direcao = 1
 # OBJETOS
 btn_start = Actor('btn_start', (500, 250))
 btn_exit = Actor('btn_exit', (500, 400))
-player = Actor('character_green_idle', (250, 300))
+player = Actor('character_green_idle')
+hud_helmet = Actor('hud_player_helmet_green', (80, 80))
+hud_character3 = Actor('hud_character_3', (125, 80))
+hud_character0 = Actor('hud_character_0', (220, 80))
 player.anchor = ('center', 'bottom')
+hud_helmet.anchor = ('center', 'center')
+hud_character3.anchor = ('center', 'center')
+hud_character0.anchor = ('center', 'center')
+hud_key = Actor('hud_key_blue', (180, 80))
+hud_key.anchor = ('center', 'center')
 plataformas = []
 lavas = []
 # CENARIO
@@ -187,6 +195,11 @@ def draw():
         player.x -= scroll_x
         player.draw()
         player.x = ox
+
+        hud_helmet.draw()
+        hud_character3.draw()
+        hud_character0.draw()
+        hud_key.draw()
 
         for lava in lavas:
             pos_original = lava.x
